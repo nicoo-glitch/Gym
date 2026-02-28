@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>APEX GYM — Forge Your Limits</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,300;0,400;0,600;0,700;0,900;1,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --black: #0a0a0a;
+      --dark: #111111;
+      --card: #161616;
+      --red: #e8152a;
+      --red-dark: #b80f20;
+      --red-glow: rgba(232,21,42,0.35);
+      --white: #f5f0eb;
+      --grey: #8a8a8a;
+      --light-grey: #2a2a2a;
+      --font-display: 'Bebas Neue', sans-serif;
+      --font-body: 'Barlow', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+    }
+
+    /* ─── SCROLLBAR ─── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--dark); }
+    ::-webkit-scrollbar-thumb { background: var(--red); border-radius: 2px; }
+
+    /* ─── NOISE OVERLAY ─── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.4;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 4rem;
+      transition: background 0.4s, backdrop-filter 0.4s;
+    }
+    nav.scrolled {
+      background: rgba(10,10,10,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--light-grey);
+    }
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      letter-spacing: 4px;
+      color: var(--white);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--red); }
+
+    .nav-links {
+      display: flex; align-items: center; gap: 2.5rem;
+      list-style: none;
+    }
+    .nav-links a {
+      color: rgba(255,255,255,0.85);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      transition: color 0.2s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute; bottom: -4px; left: 0; right: 0;
+      height: 2px; background: var(--red);
+      transform: scaleX(0); transform-origin: left;
+      transition: transform 0.3s;
+    }
+    .nav-links a:hover { color: var(--white); }
+    .nav-links a:hover::after { transform: scaleX(1); }
+
+    .btn-nav {
+      background: var(--red);
+      color: var(--white) !important;
+      padding: 0.6rem 1.5rem;
+      border-radius: 2px;
+      font-weight: 700 !important;
+      letter-spacing: 2px;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.15s !important;
+    }
+    .btn-nav::after { display: none !important; }
+    .btn-nav:hover {
+      background: var(--red-dark) !important;
+      box-shadow: 0 0 24px var(--red-glow) !important;
+      transform: translateY(-1px) !important;
+    }
+
+    /* Hamburger */
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+    .hamburger span { display: block; width: 26px; height: 2px; background: var(--white); transition: all 0.3s; }
+    .hamburger.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.active span:nth-child(2) { opacity: 0; }
+    .hamburger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .mobile-menu {
+      display: none;
+      position: fixed; inset: 0; top: 0;
+      background: rgba(10,10,10,0.97);
+      backdrop-filter: blur(20px);
+      z-index: 99;
+      flex-direction: column; align-items: center; justify-content: center; gap: 2.5rem;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      font-family: var(--font-display);
+      font-size: 3rem;
+      letter-spacing: 6px;
+      color: var(--white);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .mobile-menu a:hover { color: var(--red); }
+
+    /* ─── HERO ─── */
+    #hero {
+      position: relative;
+      height: 100vh; min-height: 600px;
+      display: flex; align-items: flex-end;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background: 
+        linear-gradient(to bottom, rgba(10,10,10,0.2) 0%, rgba(10,10,10,0.85) 100%),
+        url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1800&q=85') center/cover no-repeat;
+      animation: subtle-zoom 20s ease-in-out infinite alternate;
+    }
+    @keyframes subtle-zoom {
+      from { transform: scale(1); }
+      to   { transform: scale(1.05); }
+    }
+
+    /* Red diagonal bar */
+    #hero::after {
+      content: '';
+      position: absolute;
+      bottom: -1px; left: 0; right: 0;
+      height: 120px;
+      background: var(--black);
+      clip-path: polygon(0 60%, 100% 0%, 100% 100%, 0% 100%);
+    }
+
+    .hero-content {
+      position: relative; z-index: 2;
+      padding: 0 4rem 0.5rem;
+      max-width: 900px;
+    }
+    .hero-eyebrow {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: -0.15rem;
+      display: flex; align-items: center; gap: 12px;
+      opacity: 0; animation: fadeUp 0.8s 0.3s forwards;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      display: block; width: 40px; height: 2px; background: var(--red);
+    }
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(4rem, 10vw, 8rem);
+      line-height: 0.9;
+      letter-spacing: 4px;
+      color: var(--white);
+      opacity: 0; animation: fadeUp 0.8s 0.5s forwards;
+    }
+    .hero-title em { color: var(--red); font-style: normal; display: block; position: relative; font-size: 1.15em; margin-top: 0.2;}
+    .hero-title em::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 10%;
+  width: 100%;
+  height: 20%;
+  background: var(--red);
+  z-index: -1;
+  opacity: 0.15;
+}
+    .hero-sub {
+      font-size: 1.1rem;
+      font-weight: 300;
+      color: rgba(245,240,235,0.7);
+      max-width: 480px;
+      line-height: 1.7;
+      margin-top: 1.5rem;
+      opacity: 0; animation: fadeUp 0.8s 0.7s forwards;
+    }
+    .hero-ctas {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      margin-top: 2.5rem;
+      opacity: 0; animation: fadeUp 0.8s 0.9s forwards;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── BUTTONS ─── */
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--red);
+      color: var(--white);
+      padding: 1rem 2.2rem;
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: 2px;
+      border: none; cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover {
+      background: var(--red-dark);
+      box-shadow: 0 6px 28px var(--red-glow);
+      transform: translateY(-2px);
+    }
+    .btn-outline {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: transparent;
+      color: var(--white);
+      padding: 1rem 2.2rem;
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: 2px;
+      border: 1px solid rgba(245,240,235,0.3);
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+    }
+    .btn-outline:hover {
+      border-color: var(--white);
+      background: rgba(245,240,235,0.06);
+      transform: translateY(-2px);
+    }
+
+    /* ─── STATS BAR ─── */
+    .stats-bar {
+      display: flex; justify-content: center; gap: 0;
+      background: var(--red);
+      position: relative; z-index: 3;
+    }
+    .stat-item {
+      flex: 1;
+      text-align: center;
+      padding: 1.8rem 1rem;
+      border-right: 1px solid rgba(255,255,255,0.15);
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-item::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0);
+      transition: background 0.3s;
+    }
+    .stat-item:hover::before { background: rgba(0,0,0,0.15); }
+    .stat-num {
+      font-family: var(--font-display);
+      font-size: 2.8rem;
+      letter-spacing: 2px;
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0.8;
+      margin-top: 4px;
+    }
+
+    /* ─── SECTIONS ─── */
+    section { padding: 6rem 4rem; }
+    .section-tag {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--red);
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 1rem;
+    }
+    .section-tag::before { content: ''; display: block; width: 30px; height: 2px; background: var(--red); }
+    h2 {
+      font-family: var(--font-display);
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      line-height: 1;
+      letter-spacing: 2px;
+    }
+
+    /* ─── SERVICES ─── */
+    #services { background: var(--dark); }
+    .services-header { max-width: 600px; margin-bottom: 4rem; }
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--light-grey);
+    }
+    .service-card {
+      background: var(--card);
+      padding: 3rem 2.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.3s;
+    }
+    .service-card::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 100%; height: 3px;
+      background: var(--red);
+      transform: scaleX(0); transform-origin: left;
+      transition: transform 0.4s;
+    }
+    .service-card:hover { background: #1c1c1c; }
+    .service-card:hover::before { transform: scaleX(1); }
+
+    .service-icon {
+      width: 60px; height: 60px;
+      background: rgba(232,21,42,0.1);
+      border: 1px solid rgba(232,21,42,0.3);
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+      color: var(--red);
+      margin-bottom: 2rem;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+    .service-card:hover .service-icon {
+      background: rgba(232,21,42,0.2);
+      box-shadow: 0 0 20px var(--red-glow);
+    }
+    .service-card h3 {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      letter-spacing: 2px;
+      margin-bottom: 1rem;
+    }
+    .service-card p { color: var(--grey); font-size: 0.95rem; line-height: 1.7; }
+    .service-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: var(--red);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-decoration: none;
+      margin-top: 2rem;
+      transition: gap 0.2s;
+    }
+    .service-link:hover { gap: 14px; }
+
+    /* ─── ABOUT ─── */
+    #about {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      align-items: center;
+    }
+    .about-img-wrap {
+      position: relative;
+      aspect-ratio: 4/5;
+    }
+    .about-img-wrap img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .about-img-wrap::before {
+      content: '';
+      position: absolute;
+      inset: -12px;
+      border: 2px solid var(--red);
+      z-index: -1;
+      opacity: 0.4;
+    }
+    .about-badge {
+      position: absolute;
+      bottom: 2rem; right: -2rem;
+      background: var(--red);
+      padding: 1.5rem;
+      text-align: center;
+      min-width: 120px;
+    }
+    .about-badge .num {
+      font-family: var(--font-display);
+      font-size: 3rem;
+      line-height: 1;
+    }
+    .about-badge .lbl {
+      font-size: 0.65rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+    .about-content p { color: var(--grey); font-size: 1rem; line-height: 1.8; margin: 1.5rem 0; }
+    .about-features { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 2rem 0; }
+    .feature-pill {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+    .feature-pill i { color: var(--red); }
+
+    /* ─── SCHEDULE ─── */
+    #schedule { background: var(--dark); }
+    .schedule-header { text-align: center; margin-bottom: 3rem; }
+    .schedule-tabs {
+      display: flex; gap: 0; justify-content: center;
+      border: 1px solid var(--light-grey);
+      width: fit-content; margin: 0 auto 3rem;
+    }
+    .tab-btn {
+      padding: 0.8rem 1.8rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      border: none;
+      background: transparent;
+      color: var(--grey);
+      cursor: pointer;
+      transition: all 0.2s;
+      border-right: 1px solid var(--light-grey);
+    }
+    .tab-btn:last-child { border-right: none; }
+    .tab-btn.active { background: var(--red); color: var(--white); }
+    .tab-btn:not(.active):hover { background: var(--light-grey); color: var(--white); }
+
+    .classes-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--light-grey);
+    }
+    .class-card {
+      background: var(--card);
+      padding: 2rem;
+      position: relative;
+      transition: background 0.3s;
+    }
+    .class-card:hover { background: #1d1d1d; }
+    .class-time {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      color: var(--red);
+      letter-spacing: 2px;
+    }
+    .class-name {
+      font-weight: 700;
+      font-size: 1rem;
+      margin: 0.5rem 0 0.3rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .class-meta { font-size: 0.8rem; color: var(--grey); }
+    .class-duration {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 3px 10px;
+      border: 1px solid var(--light-grey);
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      color: var(--grey);
+    }
+
+    /* ─── PRICING ─── */
+    #pricing {
+      text-align: center;
+      background: var(--black);
+      position: relative;
+      overflow: hidden;
+    }
+    #pricing::before {
+      content: 'APEX';
+      position: absolute;
+      font-family: var(--font-display);
+      font-size: 30vw;
+      color: rgba(255,255,255,0.02);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      letter-spacing: 20px;
+      pointer-events: none;
+    }
+    .pricing-sub { color: var(--grey); font-size: 1rem; max-width: 500px; margin: 1rem auto 4rem; line-height: 1.7; }
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--light-grey);
+      position: relative; z-index: 1;
+    }
+    .price-card {
+      background: var(--card);
+      padding: 3rem 2rem;
+      position: relative;
+      transition: background 0.3s;
+      display: flex; flex-direction: column;
+    }
+    .price-card.featured {
+      background: var(--red);
+      margin: -20px 0;
+      padding: 4rem 2rem;
+      z-index: 2;
+    }
+    .price-card:not(.featured):hover { background: #1c1c1c; }
+    .plan-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--grey);
+      margin-bottom: 1.5rem;
+    }
+    .price-card.featured .plan-label { color: rgba(255,255,255,0.7); }
+    .plan-price {
+      font-family: var(--font-display);
+      font-size: 4.5rem;
+      line-height: 1;
+      letter-spacing: 2px;
+    }
+    .plan-price sup { font-size: 1.5rem; vertical-align: top; margin-top: 0.8rem; display: inline-block; }
+    .plan-price span { font-size: 1rem; font-family: var(--font-body); font-weight: 300; color: var(--grey); }
+    .price-card.featured .plan-price span { color: rgba(255,255,255,0.7); }
+    .plan-divider { width: 40px; height: 2px; background: var(--red); margin: 1.5rem auto; }
+    .price-card.featured .plan-divider { background: rgba(255,255,255,0.4); }
+    .plan-features { list-style: none; margin: 1.5rem 0 2.5rem; text-align: left; flex: 1; }
+    .plan-features li {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 0.9rem;
+      color: var(--grey);
+      padding: 0.6rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .price-card.featured .plan-features li { color: rgba(255,255,255,0.8); border-bottom-color: rgba(255,255,255,0.1); }
+    .plan-features li i { color: var(--red); font-size: 0.7rem; }
+    .price-card.featured .plan-features li i { color: var(--white); }
+    .btn-plan {
+      padding: 0.9rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: block;
+      text-align: center;
+    }
+    .btn-plan-outline {
+      border: 1px solid var(--light-grey);
+      background: transparent;
+      color: var(--white);
+    }
+    .btn-plan-outline:hover { border-color: var(--red); color: var(--red); }
+    .btn-plan-white {
+      background: var(--white);
+      color: var(--red);
+      border: none;
+      font-family: var(--font-body);
+    }
+    .btn-plan-white:hover { background: var(--black); color: var(--white); }
+
+    /* ─── TESTIMONIALS ─── */
+    #testimonials { background: var(--dark); }
+    .testi-header { max-width: 550px; margin-bottom: 4rem; }
+    .testi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--light-grey);
+    }
+    .testi-card {
+      background: var(--card);
+      padding: 2.5rem;
+      position: relative;
+      transition: background 0.3s;
+    }
+    .testi-card:hover { background: #1d1d1d; }
+    .stars { color: var(--red); font-size: 0.8rem; margin-bottom: 1.5rem; }
+    .quote {
+      font-size: 0.95rem;
+      line-height: 1.8;
+      color: var(--grey);
+      font-style: italic;
+      margin-bottom: 2rem;
+    }
+    .testi-author { display: flex; align-items: center; gap: 1rem; }
+    .author-avatar {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: var(--light-grey);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      color: var(--red);
+      border: 2px solid rgba(232,21,42,0.3);
+      overflow: hidden;
+    }
+    .author-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .author-name { font-weight: 700; font-size: 0.9rem; }
+    .author-role { font-size: 0.75rem; color: var(--grey); margin-top: 2px; }
+
+    /* ─── CONTACT ─── */
+    #contact {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+    .contact-info {
+      padding: 6rem;
+      background: var(--red);
+    }
+    .contact-info h2 { font-family: var(--font-display); font-size: 3.5rem; letter-spacing: 3px; margin-top: 1rem; }
+    .contact-info p { opacity: 0.85; line-height: 1.7; margin: 1.5rem 0 3rem; }
+    .contact-details { display: flex; flex-direction: column; gap: 1.5rem; }
+    .contact-detail {
+      display: flex; align-items: flex-start; gap: 1rem;
+    }
+    .contact-detail i { font-size: 1rem; margin-top: 3px; opacity: 0.8; }
+    .contact-detail .info strong { display: block; font-weight: 700; font-size: 0.9rem; }
+    .contact-detail .info span { font-size: 0.85rem; opacity: 0.75; }
+    .contact-social { display: flex; gap: 1rem; margin-top: 3rem; }
+    .social-btn {
+      width: 42px; height: 42px;
+      border: 1px solid rgba(255,255,255,0.4);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--white);
+      text-decoration: none;
+      font-size: 1rem;
+      border-radius: 2px;
+      transition: all 0.2s;
+    }
+    .social-btn:hover { background: rgba(255,255,255,0.2); border-color: var(--white); }
+
+    .contact-form-wrap {
+      padding: 6rem;
+      background: var(--card);
+    }
+    .contact-form-wrap h3 {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      letter-spacing: 3px;
+      margin-bottom: 2rem;
+    }
+    .form-group { margin-bottom: 1.2rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    label { display: block; font-size: 0.7rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--grey); margin-bottom: 0.5rem; }
+    input, select, textarea {
+      width: 100%;
+      background: var(--black);
+      border: 1px solid var(--light-grey);
+      color: var(--white);
+      padding: 0.9rem 1rem;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      border-radius: 2px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(232,21,42,0.15);
+    }
+    textarea { resize: vertical; min-height: 120px; }
+    select option { background: var(--black); }
+    .radio-group { display: flex; gap: 1.5rem; margin-top: 0.5rem; }
+    .radio-label { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; cursor: pointer; }
+    .radio-label input[type="radio"] { width: auto; }
+    .form-status { display: none; padding: 1rem; border-radius: 2px; font-size: 0.9rem; margin-top: 1rem; }
+    .form-status.success { display: block; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); color: #4ade80; }
+    .form-status.error { display: block; background: rgba(232,21,42,0.15); border: 1px solid rgba(232,21,42,0.3); color: #f87171; }
+    .btn-submit {
+      width: 100%;
+      background: var(--red);
+      color: var(--white);
+      border: none;
+      padding: 1.1rem;
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      margin-top: 1.5rem;
+    }
+    .btn-submit:hover { background: var(--red-dark); box-shadow: 0 6px 28px var(--red-glow); }
+    .btn-submit.loading { opacity: 0.7; pointer-events: none; }
+
+    /* ─── MAP ─── */
+    #map-section { padding: 0; }
+    #map-section iframe { display: block; width: 100%; height: 420px; border: none; filter: grayscale(80%) contrast(1.1); }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: #050505;
+      padding: 4rem 4rem 2rem;
+      border-top: 1px solid var(--light-grey);
+    }
+    .footer-top {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 4rem;
+      padding-bottom: 3rem;
+      border-bottom: 1px solid var(--light-grey);
+    }
+    .footer-brand .logo {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      letter-spacing: 4px;
+      color: var(--white);
+      text-decoration: none;
+    }
+    .footer-brand .logo span { color: var(--red); }
+    .footer-brand p { color: var(--grey); font-size: 0.9rem; line-height: 1.7; margin: 1rem 0 1.5rem; max-width: 280px; }
+    .footer-social { display: flex; gap: 0.8rem; }
+    .footer-social a {
+      width: 36px; height: 36px;
+      border: 1px solid var(--light-grey);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--grey);
+      text-decoration: none;
+      font-size: 0.9rem;
+      border-radius: 2px;
+      transition: all 0.2s;
+    }
+    .footer-social a:hover { border-color: var(--red); color: var(--red); }
+    .footer-col h4 {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--white);
+      margin-bottom: 1.5rem;
+    }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 0.8rem; }
+    .footer-col ul a { color: var(--grey); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col ul a:hover { color: var(--white); }
+    .hours-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .hours-row { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--grey); }
+    .hours-row span:last-child { color: var(--white); }
+    .footer-bottom {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-top: 2rem;
+    }
+    .footer-bottom p { color: var(--grey); font-size: 0.8rem; }
+    .footer-bottom a { color: var(--grey); text-decoration: none; font-size: 0.8rem; transition: color 0.2s; }
+    .footer-bottom a:hover { color: var(--red); }
+    .footer-links { display: flex; gap: 2rem; }
+    .footer-copy {
+  text-align: center;
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.6);
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
+}
+.footer-credit {
+  margin-top: 2rem;
+  font-size: 0.85rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  text-align: center;
+}
+
+.footer-credit a {
+  color: var(--red);
+  text-decoration: none;
+  font-weight: 600;
+  transition: opacity 0.3s ease;
+}
+
+.footer-credit a:hover {
+  opacity: 0.7;
+}
+
+    /* ─── SCROLL REVEAL ─── */
+    .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.7s, transform 0.7s; }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 1100px) {
+      nav { padding: 1.2rem 2rem; }
+      section { padding: 5rem 2rem; }
+      .contact-info, .contact-form-wrap { padding: 4rem 3rem; }
+      footer { padding: 3rem 2rem 1.5rem; }
+      .footer-top { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+    }
+
+    @media (max-width: 900px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      #about { grid-template-columns: 1fr; gap: 3rem; }
+      .about-img-wrap { aspect-ratio: 16/9; }
+      .about-badge { right: 1rem; }
+      .services-grid { grid-template-columns: 1fr 1fr; }
+      .classes-grid { grid-template-columns: repeat(2, 1fr); }
+      .testi-grid { grid-template-columns: 1fr 1fr; }
+      .pricing-grid { grid-template-columns: 1fr; gap: 1px; }
+      .price-card.featured { margin: 0; padding: 3rem 2rem; }
+      #contact { grid-template-columns: 1fr; }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 768px) 
+      { .schedule-tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+      .tab-btn {flex: 1 1 45%; text-align: center; }
+      .hero-content { padding: 0 1.5rem 6rem; }
+      .stats-bar { flex-wrap: wrap; }
+      .stat-item { min-width: 50%; border-bottom: 1px solid rgba(255,255,255,0.15); }
+      section { padding: 4rem 1.5rem; }
+      .form-row { grid-template-columns: 1fr; }
+      .contact-info, .contact-form-wrap { padding: 3rem 1.5rem; }
+      footer { padding: 2.5rem 1.5rem 1.5rem; }
+    }
+
+    @media (max-width: 480px) {
+      .services-grid { grid-template-columns: 1fr; }
+      .testi-grid { grid-template-columns: 1fr; }
+      .classes-grid { grid-template-columns: 1fr; }
+      .footer-top { grid-template-columns: 1fr; }
+      .hero-title { font-size: 3.8rem; }
+    }
+
+    /* click to call */
+    a[href^="tel"] { color: inherit; text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#hero" onclick="closeMobile()">Inicio</a>
+  <a href="#about" onclick="closeMobile()">Nosotros</a>
+  <a href="#services" onclick="closeMobile()">Servicios</a>
+  <a href="#schedule" onclick="closeMobile()">Clases</a>
+  <a href="#pricing" onclick="closeMobile()">Planes</a>
+  <a href="#contact" onclick="closeMobile()">Contacto</a>
+</div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#hero" class="nav-logo">APE<span>X</span></a>
+  <ul class="nav-links">
+    <li><a href="#about">Nosotros</a></li>
+    <li><a href="#services">Servicios</a></li>
+    <li><a href="#schedule">Clases</a></li>
+    <li><a href="#pricing">Planes</a></li>
+    <li><a href="#contact">Contacto</a></li>
+    <li><a href="#contact" class="btn-nav">Únete Ya</a></li>
+  </ul>
+  <div class="hamburger" id="hamburger" onclick="toggleMobile()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow"><i class="fas fa-dumbbell"></i> Elite Performance Center</p>
+    <h1 class="hero-title">Forja<em>TU LÍMITE</em></h1>
+    <p class="hero-sub">Entrená con los mejores. Equipamiento de primer nivel, entrenadores certificados y una comunidad que te empuja a superar cualquier barrera.</p>
+    <div class="hero-ctas">
+      <a href="#pricing" class="btn-primary"><i class="fas fa-fire"></i> Empezar Gratis</a>
+      <a href="#schedule" class="btn-outline"><i class="fas fa-calendar-alt"></i> Ver Clases</a>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <div class="stat-num" data-target="1500">0</div>
+    <div class="stat-label">Miembros Activos</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num" data-target="12">0</div>
+    <div class="stat-label">Años de Experiencia</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num" data-target="30">0</div>
+    <div class="stat-label">Clases Semanales</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num" data-target="98">0</div>
+    <div class="stat-label">% Satisfacción</div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-img-wrap reveal">
+    <img src="https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=800&q=80" alt="Interior del gym APEX" loading="lazy" />
+    <div class="about-badge">
+      <div class="num">12+</div>
+      <div class="lbl">Años<br>Élite</div>
+    </div>
+  </div>
+  <div class="about-content reveal">
+    <div class="section-tag"><i class="fas fa-trophy"></i> Sobre Nosotros</div>
+    <h2>NO ES UN GYM.<br>ES UN ESTADO<br>MENTAL.</h2>
+    <p>En APEX creemos que cada persona tiene una versión más fuerte de sí misma. Nuestro trabajo es ayudarte a encontrarla. Desde el primer día vas a sentir la diferencia: instalaciones premium, equipamiento de última generación y coaches que se dedican 100% a tu progreso.</p>
+    <p>Fundado en 2013 en el corazón de Buenos Aires, somos más que un gimnasio — somos una comunidad.</p>
+    <div class="about-features">
+      <div class="feature-pill"><i class="fas fa-check-circle"></i> Equipamiento Tecnife</div>
+      <div class="feature-pill"><i class="fas fa-check-circle"></i> Coaches Certificados</div>
+      <div class="feature-pill"><i class="fas fa-check-circle"></i> Zona de Recovery</div>
+      <div class="feature-pill"><i class="fas fa-check-circle"></i> Nutricionista On-Site</div>
+      <div class="feature-pill"><i class="fas fa-check-circle"></i> Lockers Premium</div>
+      <div class="feature-pill"><i class="fas fa-check-circle"></i> Apertura 24/7</div>
+    </div>
+    <a href="#contact" class="btn-primary" style="width:fit-content;"><i class="fas fa-arrow-right"></i> Conocé el Gym</a>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="services-header reveal">
+    <div class="section-tag"><i class="fas fa-bolt"></i> Servicios</div>
+    <h2>TODO LO QUE NECESITÁS PARA RENDIR AL MÁXIMO</h2>
+  </div>
+  <div class="services-grid reveal">
+    <div class="service-card">
+      <div class="service-icon"><i class="fas fa-user-shield"></i></div>
+      <h3>Entrenamiento Personal</h3>
+      <p>Planes 100% personalizados con seguimiento continuo. Tu coach diseña cada sesión para maximizar resultados según tus objetivos y nivel actual.</p>
+      <a href="#contact" class="service-link">Reservar sesión <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div class="service-card">
+      <div class="service-icon"><i class="fas fa-users"></i></div>
+      <h3>Clases Grupales</h3>
+      <p>Más de 30 clases semanales: CrossFit, Spinning, Boxing, HIIT, Yoga y más. La energía del grupo te lleva más lejos de lo que podrías ir solo.</p>
+      <a href="#schedule" class="service-link">Ver horarios <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div class="service-card">
+      <div class="service-icon"><i class="fas fa-dumbbell"></i></div>
+      <h3>Sala de Musculación</h3>
+      <p>2.000 m² con equipamiento Technogym de última generación. Zona de pesas libres, máquinas cardiovasculares y área funcional.</p>
+      <a href="#pricing" class="service-link">Ver planes <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div class="service-card">
+      <div class="service-icon"><i class="fas fa-heartbeat"></i></div>
+      <h3>Zona Cardio</h3>
+      <p>Cintas, bicicletas, remos y elípticas con pantallas integradas y conectividad. Cardio inteligente con métricas en tiempo real.</p>
+      <a href="#contact" class="service-link">Más info <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div class="service-card">
+      <div class="service-icon"><i class="fas fa-apple-alt"></i></div>
+      <h3>Nutrición Deportiva</h3>
+      <p>Consultá con nuestra nutricionista certificada. Plan alimentario personalizado integrado con tu programa de entrenamiento.</p>
+      <a href="#contact" class="service-link">Agendar consulta <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div class="service-card">
+      <div class="service-icon"><i class="fas fa-spa"></i></div>
+      <h3>Zona de Recovery</h3>
+      <p>Sauna finlandesa, baño de vapor, piscina de contraste y área de stretching guiado. Tu recuperación es parte del entrenamiento.</p>
+      <a href="#pricing" class="service-link">Ver planes <i class="fas fa-arrow-right"></i></a>
+    </div>
+  </div>
+</section>
+
+<!-- SCHEDULE -->
+<section id="schedule">
+  <div class="schedule-header reveal">
+    <div class="section-tag" style="justify-content:center;"><i class="fas fa-calendar-week"></i> Horarios</div>
+    <h2>ELEGÍ TU CLASE</h2>
+    <p style="color:var(--grey);margin-top:1rem;font-size:0.95rem;">Entrenamiento de alto impacto todos los días de la semana.</p>
+  </div>
+  <div style="text-align:center;" class="reveal">
+    <div class="schedule-tabs">
+      <button class="tab-btn active" onclick="filterClasses('lun')">LUN</button>
+      <button class="tab-btn" onclick="filterClasses('mar')">MAR</button>
+      <button class="tab-btn" onclick="filterClasses('mie')">MIÉ</button>
+      <button class="tab-btn" onclick="filterClasses('jue')">JUE</button>
+      <button class="tab-btn" onclick="filterClasses('vie')">VIE</button>
+      <button class="tab-btn" onclick="filterClasses('sab')">SÁB</button>
+    </div>
+  </div>
+  <div class="classes-grid reveal" id="classesGrid">
+    <!-- Populated by JS -->
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="section-tag" style="justify-content:center;" ><i class="fas fa-tag"></i> Precios</div>
+  <h2 class="reveal" style="margin-top:0.5rem;">ELEGÍ TU PLAN</h2>
+  <p class="pricing-sub reveal">Sin contratos de largo plazo. Cancelá cuando quieras. Empezá con 7 días gratis.</p>
+  <div class="pricing-grid reveal">
+    <div class="price-card">
+      <p class="plan-label">Starter</p>
+      <div class="plan-price"><sup>$</sup>8.999<span>/mes</span></div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li><i class="fas fa-check"></i> Acceso Sala de Musculación</li>
+        <li><i class="fas fa-check"></i> 2 Clases Grupales / semana</li>
+        <li><i class="fas fa-check"></i> Lockers estándar</li>
+        <li><i class="fas fa-check"></i> App de seguimiento</li>
+        <li style="opacity:0.3;"><i class="fas fa-times"></i> Entrenamiento Personal</li>
+        <li style="opacity:0.3;"><i class="fas fa-times"></i> Zona Recovery</li>
+      </ul>
+      <a href="#contact" class="btn-plan btn-plan-outline">Empezar Ahora</a>
+    </div>
+    <div class="price-card featured">
+      <p class="plan-label">⚡ Más Popular — Pro</p>
+      <div class="plan-price"><sup>$</sup>14.999<span>/mes</span></div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li><i class="fas fa-check"></i> Acceso ilimitado 24/7</li>
+        <li><i class="fas fa-check"></i> Clases Grupales ilimitadas</li>
+        <li><i class="fas fa-check"></i> 2 sesiones con Entrenador Personal / mes</li>
+        <li><i class="fas fa-check"></i> Zona Recovery incluida</li>
+        <li><i class="fas fa-check"></i> Consulta nutricional</li>
+        <li><i class="fas fa-check"></i> Locker Premium</li>
+      </ul>
+      <a href="#contact" class="btn-plan btn-plan-white">Empezar Ahora</a>
+    </div>
+    <div class="price-card">
+      <p class="plan-label">Elite</p>
+      <div class="plan-price"><sup>$</sup>24.999<span>/mes</span></div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li><i class="fas fa-check"></i> Todo lo del plan Pro</li>
+        <li><i class="fas fa-check"></i> Entrenador Personal Ilimitado </li>
+        <li><i class="fas fa-check"></i> Plan nutricional mensual</li>
+        <li><i class="fas fa-check"></i> Acceso invitados (2/mes)</li>
+        <li><i class="fas fa-check"></i> Análisis corporal mensual</li>
+        <li><i class="fas fa-check"></i> Toallas y amenities</li>
+      </ul>
+      <a href="#contact" class="btn-plan btn-plan-outline">Empezar Ahora</a>
+    </div>
+  </div>
+  <p style="color:var(--grey);font-size:0.8rem;margin-top:2rem;text-align:center;" class="reveal">* Todos los precios en pesos argentinos. Primer mes con 30% de descuento al mostrar esta página.</p>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="testi-header reveal">
+    <div class="section-tag"><i class="fas fa-star"></i> Testimonios</div>
+    <h2>LO QUE DICE NUESTRA COMUNIDAD</h2>
+  </div>
+  <div class="testi-grid reveal">
+    <div class="testi-card">
+      <div class="stars">★★★★★</div>
+      <p class="quote">"Empecé sin saber nada de entrenamiento y en 6 meses bajé 12 kilos. Los coaches son increíbles, siempre hay alguien dispuesto a ayudarte."</p>
+      <div class="testi-author">
+        <div class="author-avatar"><img src="https://i.pravatar.cc/100?img=1" alt="Lucía M." /></div>
+        <div>
+          <div class="author-name">Lucía Martínez</div>
+          <div class="author-role">Miembro desde 2022</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="stars">★★★★★</div>
+      <p class="quote">"El plan Elite valió cada peso. Tengo un coach que me conoce, sabe mis objetivos y cada sesión es diferente. Nunca me aburrí entrenando en ningún lado como acá."</p>
+      <div class="testi-author">
+        <div class="author-avatar"><img src="https://i.pravatar.cc/100?img=11" alt="Marcos R." /></div>
+        <div>
+          <div class="author-name">Marcos Rodríguez</div>
+          <div class="author-role">Miembro desde 2021</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="stars">★★★★★</div>
+      <p class="quote">"Las clases de spinning con Diego son adictivas. La energía del grupo te hace dar ese 10% extra que necesitás. Y la zona de recovery es lo que me terminó de convencer."</p>
+      <div class="testi-author">
+        <div class="author-avatar"><img src="https://i.pravatar.cc/100?img=5" alt="Valentina G." /></div>
+        <div>
+          <div class="author-name">Valentina González</div>
+          <div class="author-role">Miembro desde 2023</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="stars">★★★★★</div>
+      <p class="quote">"Vine después de una lesión y los coaches me armaron un plan de rehabilitación increíble. Hoy estoy más fuerte que antes de lesionarme. APEX cambió todo."</p>
+      <div class="testi-author">
+        <div class="author-avatar"><img src="https://i.pravatar.cc/100?img=13" alt="Sebastián P." /></div>
+        <div>
+          <div class="author-name">Sebastián Peralta</div>
+          <div class="author-role">Miembro desde 2020</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="stars">★★★★★</div>
+      <p class="quote">"La nutricionista me ayudó a entender que el 70% del resultado está en la dieta. Plan personalizado + entreno = resultados reales y duraderos. No vuelvo a ningún otro gym."</p>
+      <div class="testi-author">
+        <div class="author-avatar"><img src="https://i.pravatar.cc/100?img=9" alt="Carolina F." /></div>
+        <div>
+          <div class="author-name">Carolina Fernández</div>
+          <div class="author-role">Miembro desde 2022</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="stars">★★★★★</div>
+      <p class="quote">"El acceso 24/7 es un game changer para mi horario de trabajo. Siempre encuentro lugar, el equipamiento está impecable y la atmósfera te motiva solo con entrar."</p>
+      <div class="testi-author">
+        <div class="author-avatar"><img src="https://i.pravatar.cc/100?img=7" alt="Juan I." /></div>
+        <div>
+          <div class="author-name">Juan Ibáñez</div>
+          <div class="author-role">Miembro desde 2023</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<div id="contact">
+  <div class="contact-info">
+    <div class="section-tag" style="color:rgba(255,255,255,0.7);"><i class="fas fa-map-marker-alt"></i> Contacto</div>
+    <h2>HABLEMOS.<br>SIN VUELTAS.</h2>
+    <p>Completá el formulario o contactanos directamente. Respondemos en menos de 2 horas en días hábiles.</p>
+    <div class="contact-details">
+      <div class="contact-detail">
+        <i class="fas fa-map-marker-alt"></i>
+        <div class="info">
+          <strong>Dirección</strong>
+          <span>Av. Corrientes 1234, CABA, Buenos Aires</span>
+        </div>
+      </div>
+      <div class="contact-detail">
+        <i class="fas fa-phone"></i>
+        <div class="info">
+          <strong>Teléfono</strong>
+          <span><a href="tel:+5491112345678">+54 9 11 1234-5678</a></span>
+        </div>
+      </div>
+      <div class="contact-detail">
+        <i class="fas fa-envelope"></i>
+        <div class="info">
+          <strong>Email</strong>
+          <span>info@apexgym.com.ar</span>
+        </div>
+      </div>
+      <div class="contact-detail">
+        <i class="fas fa-clock"></i>
+        <div class="info">
+          <strong>Horarios</strong>
+          <span>Lun–Vie: 05:00–24:00 / Sáb–Dom: 07:00–22:00</span>
+        </div>
+      </div>
+    </div>
+    <div class="contact-social">
+      <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
+      <a href="#" class="social-btn"><i class="fab fa-facebook-f"></i></a>
+      <a href="#" class="social-btn"><i class="fab fa-youtube"></i></a>
+      <a href="#" class="social-btn"><i class="fab fa-tiktok"></i></a>
+      <a href="#" class="social-btn"><i class="fab fa-whatsapp"></i></a>
+    </div>
+  </div>
+  <div class="contact-form-wrap">
+    <h3>ENVIANOS UN MENSAJE</h3>
+    <form id="contactForm" onsubmit="submitForm(event)">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="name">Nombre completo</label>
+          <input type="text" id="name" placeholder="Tu nombre" required />
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="tu@email.com" required />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="phone">Teléfono</label>
+        <input type="tel" id="phone" placeholder="+54 9 11 ..." />
+      </div>
+      <div class="form-group">
+        <label>Método de contacto preferido</label>
+        <div class="radio-group">
+          <label class="radio-label"><input type="radio" name="contact" value="email" checked /> Email</label>
+          <label class="radio-label"><input type="radio" name="contact" value="phone" /> Teléfono</label>
+          <label class="radio-label"><input type="radio" name="contact" value="whatsapp" /> WhatsApp</label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="interest">¿En qué estás interesado?</label>
+        <select id="interest">
+          <option value="">Seleccioná una opción</option>
+          <option>Clase de prueba gratuita</option>
+          <option>Entrenamiento Personal</option>
+          <option>Membresía Mensual</option>
+          <option>Planes anuales</option>
+          <option>Nutrición deportiva</option>
+          <option>Otro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="message">Mensaje</label>
+        <textarea id="message" placeholder="Contanos qué objetivo tenés, dudas sobre planes, horarios..."></textarea>
+      </div>
+      <div id="formStatus" class="form-status"></div>
+      <button type="submit" class="btn-submit" id="submitBtn">
+        <span id="btnText"><i class="fas fa-paper-plane"></i> Enviar Mensaje</span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- MAP -->
+<div id="map-section">
+  <iframe
+    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3284.016839764506!2d-58.38375898420933!3d-34.603500480460636!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95bccace94f9e575%3A0xa0a36a55c2e2a4!2sAv.%20Corrientes%201234%2C%20Buenos%20Aires!5e0!3m2!1ses!2sar!4v1680000000000!5m2!1ses!2sar"
+    allowfullscreen="" loading="lazy"
+    referrerpolicy="no-referrer-when-downgrade"
+    title="Ubicación APEX GYM">
+  </iframe>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <a href="#hero" class="logo">APE<span>X</span></a>
+      <p>Más que un gimnasio. Un espacio donde forjás la mejor versión de vos mismo. Equipamiento premium, coaches de élite y una comunidad sin igual.</p>
+      <div class="footer-social">
+        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="#"><i class="fab fa-facebook-f"></i></a>
+        <a href="#"><i class="fab fa-youtube"></i></a>
+        <a href="#"><i class="fab fa-tiktok"></i></a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Navegación</h4>
+      <ul>
+        <li><a href="#about">Nosotros</a></li>
+        <li><a href="#services">Servicios</a></li>
+        <li><a href="#schedule">Clases</a></li>
+        <li><a href="#pricing">Planes</a></li>
+        <li><a href="#testimonials">Testimonios</a></li>
+        <li><a href="#contact">Contacto</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Servicios</h4>
+      <ul>
+        <li><a href="#">Entrenamiento Personal</a></li>
+        <li><a href="#">Clases Grupales</a></li>
+        <li><a href="#">Musculación</a></li>
+        <li><a href="#">Nutrición</a></li>
+        <li><a href="#">Zone Recovery</a></li>
+        <li><a href="#">Cardio</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Horarios</h4>
+      <div class="hours-list">
+        <div class="hours-row"><span>Lun – Vie</span><span>05:00 – 24:00</span></div>
+        <div class="hours-row"><span>Sábado</span><span>07:00 – 22:00</span></div>
+        <div class="hours-row"><span>Domingo</span><span>08:00 – 20:00</span></div>
+        <div class="hours-row"><span>Feriados</span><span>08:00 – 18:00</span></div>
+      </div>
+    </div>
+  </div>
+<div class="footer-copy">
+  © 2026 APEX GYM. Todos los derechos reservados.
+</div>
+
+<div class="footer-credit">
+  Diseñado por 
+  <a href="https://vex-studio.netlify.app/" target="_blank" rel="noopener">
+    VEX STUDIO
+  </a>
+</div>
+</footer>
+
+<script>
+  /* ─── NAV SCROLL ─── */
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  /* ─── MOBILE MENU ─── */
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  function toggleMobile() {
+    hamburger.classList.toggle('active');
+    mobileMenu.classList.toggle('open');
+    document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+  }
+  function closeMobile() {
+    hamburger.classList.remove('active');
+    mobileMenu.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  /* ─── COUNTER ANIMATION ─── */
+  function animateCounter(el, target, suffix = '') {
+    let current = 0;
+    const step = target / 60;
+    const timer = setInterval(() => {
+      current += step;
+      if (current >= target) { current = target; clearInterval(timer); }
+      el.textContent = Math.floor(current).toLocaleString('es-AR') + suffix;
+    }, 25);
+  }
+  const statsObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const el = e.target;
+        const target = parseInt(el.dataset.target);
+        const suffix = el.dataset.target == '98' ? '%' : (el.dataset.target == '1500' ? '+' : '');
+        animateCounter(el, target, suffix);
+        statsObserver.unobserve(el);
+      }
+    });
+  }, { threshold: 0.5 });
+  document.querySelectorAll('.stat-num').forEach(el => statsObserver.observe(el));
+
+  /* ─── REVEAL ANIMATION ─── */
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revealObserver.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+  /* ─── CLASSES SCHEDULE ─── */
+  const classData = {
+    lun: [
+      { time: '06:00', name: 'HIIT Matutino', coach: 'Lucas M.', duration: '45 min' },
+      { time: '08:30', name: 'Yoga Flow', coach: 'Daniela R.', duration: '60 min' },
+      { time: '10:00', name: 'Spinning', coach: 'Diego F.', duration: '50 min' },
+      { time: '18:30', name: 'CrossFit', coach: 'Matías G.', duration: '60 min' },
+    ],
+    mar: [
+      { time: '07:00', name: 'Body Pump', coach: 'Natalia C.', duration: '55 min' },
+      { time: '09:00', name: 'Pilates', coach: 'Ana L.', duration: '60 min' },
+      { time: '12:00', name: 'Boxing Fit', coach: 'Roberto V.', duration: '45 min' },
+      { time: '20:00', name: 'Functional', coach: 'Lucas M.', duration: '50 min' },
+    ],
+    mie: [
+      { time: '06:00', name: 'Spinning', coach: 'Diego F.', duration: '50 min' },
+      { time: '09:30', name: 'HIIT', coach: 'Matías G.', duration: '45 min' },
+      { time: '11:00', name: 'Yoga', coach: 'Daniela R.', duration: '60 min' },
+      { time: '19:00', name: 'CrossFit', coach: 'Roberto V.', duration: '60 min' },
+    ],
+    jue: [
+      { time: '07:00', name: 'Body Combat', coach: 'Natalia C.', duration: '55 min' },
+      { time: '10:00', name: 'Pilates', coach: 'Ana L.', duration: '60 min' },
+      { time: '13:00', name: 'Spinning', coach: 'Diego F.', duration: '50 min' },
+      { time: '18:00', name: 'HIIT', coach: 'Lucas M.', duration: '45 min' },
+    ],
+    vie: [
+      { time: '06:30', name: 'CrossFit', coach: 'Matías G.', duration: '60 min' },
+      { time: '09:00', name: 'Boxing Fit', coach: 'Roberto V.', duration: '45 min' },
+      { time: '11:00', name: 'Yoga Restore', coach: 'Daniela R.', duration: '75 min' },
+      { time: '17:30', name: 'Functional', coach: 'Natalia C.', duration: '50 min' },
+    ],
+    sab: [
+      { time: '08:00', name: 'CrossFit Sábado', coach: 'Matías G.', duration: '75 min' },
+      { time: '10:00', name: 'Spinning', coach: 'Diego F.', duration: '60 min' },
+      { time: '11:30', name: 'Yoga Flow', coach: 'Daniela R.', duration: '60 min' },
+      { time: '13:00', name: 'HIIT Intensivo', coach: 'Lucas M.', duration: '45 min' },
+    ],
+  };
+
+  function filterClasses(day) {
+    document.querySelectorAll('.tab-btn').forEach((b, i) => {
+      b.classList.toggle('active', ['lun','mar','mie','jue','vie','sab'][i] === day);
+    });
+    const grid = document.getElementById('classesGrid');
+    grid.innerHTML = '';
+    classData[day].forEach(cls => {
+      grid.innerHTML += `
+        <div class="class-card">
+          <div class="class-time">${cls.time}</div>
+          <div class="class-name">${cls.name}</div>
+          <div class="class-meta"><i class="fas fa-user" style="color:var(--red);font-size:0.7rem;"></i> ${cls.coach}</div>
+          <div class="class-duration"><i class="fas fa-clock"></i> ${cls.duration}</div>
+          <a href="#contact" class="service-link" style="margin-top:1rem;font-size:0.75rem;">Reservar <i class="fas fa-arrow-right"></i></a>
+        </div>`;
+    });
+  }
+  filterClasses('lun');
+
+  /* ─── FORM SUBMIT ─── */
+  function submitForm(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    const status = document.getElementById('formStatus');
+    btn.classList.add('loading');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+    setTimeout(() => {
+      btn.classList.remove('loading');
+      btn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Mensaje';
+      status.className = 'form-status success';
+      status.textContent = '✅ ¡Mensaje enviado! Te contactaremos en menos de 2 horas.';
+      document.getElementById('contactForm').reset();
+      setTimeout(() => { status.className = 'form-status'; }, 5000);
+    }, 1800);
+  }
+</script>
+</body>
+</html>
